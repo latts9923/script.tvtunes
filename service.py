@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import xbmc
 import xbmcaddon
+
+if sys.version_info >= (2, 7):
+    import json
+else:
+    import simplejson as json
 
 # Import the common settings
 from resources.lib.settings import log
@@ -49,22 +55,34 @@ if __name__ == '__main__':
     if Settings.isThemePlayingEnabled():
         log("TvTunesService: Theme playing enabled")
 
-        if Settings.isUploadEnabled():
-            log("TvTunesService: Launching uploader")
-            xbmc.executebuiltin('RunScript(%s)' % os.path.join(LIB_DIR, "upload.py"), False)
-        else:
-            log("TvTunesService: Uploader not enabled")
+        # if Settings.isUploadEnabled():
+        #    log("TvTunesService: Launching uploader")
+        #    xbmc.executebuiltin('RunScript(%s)' % os.path.join(LIB_DIR, "upload.py"), False)
+        # else:
+        #    log("TvTunesService: Uploader not enabled")
 
-        # Create a monitor so we can reload the settings if they change
-        systemMonitor = TvTunesMonitor()
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddonDetails", "params": { "addonid": "repository.robwebset", "properties": ["enabled", "broken", "name", "author"]  }, "id": 1}')
+        json_response = json.loads(json_query)
 
-        # Start looping to perform the TvTune theme operations
-        main = TunesBackend()
+        displayNotice = True
+        if ("result" in json_response) and ('addon' in json_response['result']):
+            addonItem = json_response['result']['addon']
+            if (addonItem['enabled'] is True) and (addonItem['broken'] is False) and (addonItem['type'] == 'xbmc.addon.repository') and (addonItem['addonid'] == 'repository.robwebset') and (addonItem['author'] == 'robwebset'):
+                displayNotice = False
 
-        # Start the themes running
-        main.runAsAService()
+                # Create a monitor so we can reload the settings if they change
+                systemMonitor = TvTunesMonitor()
 
-        del main
-        del systemMonitor
+                # Start looping to perform the TvTune theme operations
+                main = TunesBackend()
+
+                # Start the themes running
+                main.runAsAService()
+
+                del main
+                del systemMonitor
+
+        if displayNotice:
+            xbmc.executebuiltin('Notification("robwebset Repository Required","github.com/robwebset/repository.robwebset",10000,%s)' % ADDON.getAddonInfo('icon'))
     else:
         log("TvTunesService: Theme playing disabled")
