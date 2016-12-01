@@ -418,7 +418,11 @@ msgctxt "#32140"
 msgid "Update Confluence Skin"
 msgstr ""
 
-#empty strings from id 32141 to 32200
+msgctxt "#32141"
+msgid "Fixed Start Time Into Media (Seconds)"
+msgstr ""
+
+#empty strings from id 32142 to 32200
 
 msgctxt "#32201"
 msgid "Movies"

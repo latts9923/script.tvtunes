@@ -1326,6 +1326,10 @@ class SoundcloudListing(DefaultListing):
 #################################################
 class ThemeLibraryListing(DefaultListing):
     def themeSearch(self, name, alternativeTitle=None, isTvShow=None, year=None, imdb=None, showProgressDialog=True):
+        # The Theme Library is not available at the moment as there is no storage available
+        xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), "Unfortunately there is no longer any online storage available to host the Theme Library (Approx 80GB). If you have storage you are willing to make available please contact robwebset via http://github.com/robwebset")
+        return []
+
         progressDialog = DummyProgressDialog(name)
         if showProgressDialog:
             progressDialog = ProgressDialog(name)

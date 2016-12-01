@@ -21,6 +21,7 @@
 		<setting id="fadeIn" type="bool" label="32013" default="false"/>
 		<setting id="shuffle" type="bool" label="32010" default="true"/>
 		<setting id="random" type="bool" label="32011" default="false"/>
+		<setting id="randomFixedOffset" label="32141" visible="eq(-1,true)" subsetting="true" type="slider" default="0" range="0,1,60" option="int" />
 		<setting id="singleThemeOnly" type="bool" label="32089" default="false"/>
 		<setting id="trackLengthLimit" label="32027" type="slider" default="0" range="0,10,180" option="int" />
 	</category>

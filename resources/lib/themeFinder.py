@@ -352,8 +352,11 @@ class ThemeFiles():
 
             if duration > 10:
                 listitem = xbmcgui.ListItem()
-                # Record if the theme should start playing part-way through
-                randomStart = random.randint(0, int(duration * 0.75))
+                # Check if there is a fixed start position
+                randomStart = Settings.getRandomFixedOffset()
+                if (randomStart < 1) or (randomStart >= duration):
+                    # Record if the theme should start playing part-way through
+                    randomStart = random.randint(0, int(duration * 0.75))
                 listitem.setProperty('StartOffset', str(randomStart))
 
                 log("ThemeFiles: Setting Random start of %d for %s" % (randomStart, filename), self.debug_logging_enabled)
@@ -390,11 +393,8 @@ class ThemeFiles():
         if workingPath.startswith("rar://"):
             workingPath = workingPath.replace("rar://", "")
 
-        # Support special paths like smb:// means that we can not just call
-        # os.path.isfile as it will return false even if it is a file
-        # (A bit of a shame - but that's the way it is)
         fileExt = None
-        if workingPath.startswith("smb://") or workingPath.startswith("afp://") or os_path_isfile(workingPath):
+        if os_path_isfile(workingPath):
             fileExt = os.path.splitext(workingPath)[1]
         # If this is a file, then get it's parent directory
         # Also limit file extensions to a maximum of 4 characters
@@ -647,8 +647,11 @@ class MusicThemeFiles():
 
             if duration > 10:
                 listitem = xbmcgui.ListItem()
-                # Record if the theme should start playing part-way through
-                randomStart = random.randint(0, int(duration * 0.75))
+                # Check if there is a fixed start position
+                randomStart = Settings.getRandomFixedOffset()
+                if (randomStart < 1) or (randomStart >= duration):
+                    # Record if the theme should start playing part-way through
+                    randomStart = random.randint(0, int(duration * 0.75))
                 listitem.setProperty('StartOffset', str(randomStart))
 
                 log("MusicThemeFiles: Setting Random start of %d for %s" % (randomStart, filename), self.debug_logging_enabled)
