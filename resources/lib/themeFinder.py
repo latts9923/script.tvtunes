@@ -25,6 +25,8 @@ from settings import dir_exists
 from settings import os_path_isfile
 from settings import normalize_string
 
+from VideoParser import VideoParser
+
 
 #############################################
 # Reads TvTunes information from an NFO file
@@ -350,6 +352,12 @@ class ThemeFiles():
 
             log("ThemeFiles: Duration is %d for file %s" % (duration, filename), self.debug_logging_enabled)
 
+            # Check if the duration of the file is showing as Zero, this means we need to
+            # try and find out the duration ourself
+            if duration < 1:
+                duration = VideoParser().getVideoLength(filename)
+                log("ThemeFiles: Manual find of duration is %d for file %s" % (duration, filename), self.debug_logging_enabled)
+
             if duration > 10:
                 listitem = xbmcgui.ListItem()
                 # Check if there is a fixed start position
@@ -644,6 +652,12 @@ class MusicThemeFiles():
             duration = int(playlist[0].getduration())
 
             log("MusicThemeFiles: Duration is %d for file %s" % (duration, filename), self.debug_logging_enabled)
+
+            # Check if the duration of the file is showing as Zero, this means we need to
+            # try and find out the duration ourself
+            if duration < 1:
+                duration = VideoParser().getVideoLength(filename)
+                log("MusicThemeFiles: Manual find of duration is %d for file %s" % (duration, filename), self.debug_logging_enabled)
 
             if duration > 10:
                 listitem = xbmcgui.ListItem()

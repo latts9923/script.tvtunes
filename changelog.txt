@@ -1,3 +1,6 @@
+v100.5.1 (2016-12-02)
+- Fix random start for video themes
+
 v100.5.0 (2016-12-01)
 - Support NFS mounted files better
 - Add support for starting a theme a fixed period in
