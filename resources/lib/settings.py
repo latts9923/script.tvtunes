@@ -452,10 +452,13 @@ class Settings():
         return ADDON.getSetting("random") == 'true'
 
     @staticmethod
-    def getRandomFixedOffset():
-        if not Settings.isRandomStart():
+    def getRandomFixedOffset(filename):
+        if not Settings.isRandomStart() or (filename in [None, ""]):
             return -1
-        return int(float(ADDON.getSetting("randomFixedOffset")))
+        fixedOffsetSetting = "randomFixedAudioOffset"
+        if Settings.isVideoFile(filename):
+            fixedOffsetSetting = "randomFixedVideoOffset"
+        return int(float(ADDON.getSetting(fixedOffsetSetting)))
 
     @staticmethod
     def isPlayMovieList():
