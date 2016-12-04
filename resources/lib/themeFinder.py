@@ -361,7 +361,7 @@ class ThemeFiles():
             if duration > 10:
                 listitem = xbmcgui.ListItem()
                 # Check if there is a fixed start position
-                randomStart = Settings.getRandomFixedOffset()
+                randomStart = Settings.getRandomFixedOffset(filename)
                 if (randomStart < 1) or (randomStart >= duration):
                     # Record if the theme should start playing part-way through
                     randomStart = random.randint(0, int(duration * 0.75))
@@ -662,7 +662,7 @@ class MusicThemeFiles():
             if duration > 10:
                 listitem = xbmcgui.ListItem()
                 # Check if there is a fixed start position
-                randomStart = Settings.getRandomFixedOffset()
+                randomStart = Settings.getRandomFixedOffset(filename)
                 if (randomStart < 1) or (randomStart >= duration):
                     # Record if the theme should start playing part-way through
                     randomStart = random.randint(0, int(duration * 0.75))

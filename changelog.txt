@@ -1,3 +1,6 @@
+v100.5.2 (2016-12-04)
+- Allow set fixed random start for either video or audio
+
 v100.5.1 (2016-12-02)
 - Fix random start for video themes
 
