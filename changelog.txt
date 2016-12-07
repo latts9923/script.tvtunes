@@ -1,3 +1,6 @@
+v100.5.3 (2016-12-07)
+- Update for support of URepo
+
 v100.5.2 (2016-12-04)
 - Allow set fixed random start for either video or audio
 

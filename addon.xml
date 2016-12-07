@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.tvtunes" name="TvTunes" version="100.5.2" provider-name="robwebset">
+<addon id="script.tvtunes" name="TvTunes" version="100.5.3" provider-name="robwebset">
 	<requires>
 		<import addon="xbmc.python" version="2.20.0"/>
 		<import addon="script.module.simplejson" version="3.3.0"/>
@@ -69,7 +69,17 @@
 		<language></language>
 		<platform>all</platform>
 		<license>See LICENSE.txt</license>
-		<forum></forum>
+		<forum>http://www.urepo.org/forum/viewtopic.php?t=1749</forum>
 		<source>https://github.com/robwebset/script.tvtunes</source>
+		<news>Available from the robwebset and URepo repositories</news>
+		<assets>
+			<icon>icon.png</icon>
+			<fanart>fanart.jpg</fanart>
+			<screenshot>resources/screenshot-01.jpg</screenshot>
+			<screenshot>resources/screenshot-02.jpg</screenshot>
+			<screenshot>resources/screenshot-03.jpg</screenshot>
+			<banner>resources/banner.jpg</banner>
+			<logo>resources/logo.png</logo>
+		</assets>
 	</extension>
 </addon>
