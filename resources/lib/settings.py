@@ -347,6 +347,8 @@ class Settings():
             return True
         if filename.lower().endswith('.m2ts'):
             return True
+        if filename.lower().endswith('.webm'):
+            return True
         return False
 
     @staticmethod
@@ -441,6 +443,8 @@ class Settings():
             fileTypes.append("mov")
         if(ADDON.getSetting("m2ts") == 'true'):
             fileTypes.append("m2ts")
+        if(ADDON.getSetting("webm") == 'true'):
+            fileTypes.append("webm")
         return '|'.join(fileTypes)
 
     @staticmethod
