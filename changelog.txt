@@ -1,3 +1,7 @@
+v100.5.4 (2016-12-24)
+- Add support for webm video files
+- Add option to use trailers as theme videos
+
 v100.5.3 (2016-12-07)
 - Update for support of URepo
 

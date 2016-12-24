@@ -426,7 +426,11 @@ msgctxt "#32142"
 msgid "Fixed Video Start Time Into Media (Seconds)"
 msgstr ""
 
-#empty strings from id 32143 to 32200
+msgctxt "#32143"
+msgid "Use Trailer Video If No Theme Available"
+msgstr ""
+
+#empty strings from id 32144 to 32200
 
 msgctxt "#32201"
 msgid "Movies"
