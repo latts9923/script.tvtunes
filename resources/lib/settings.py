@@ -430,6 +430,17 @@ class Settings():
             themeRegEx = '(.(' + fileTypes + ')$)'
         return themeRegEx
 
+    # Calculates the regular expression to use to search for trailer video files
+    @staticmethod
+    def getTrailerFileRegEx():
+        fileTypes = ""
+        videoFileTypes = Settings.getVideoThemeFileExtensions()
+        if videoFileTypes not in [None, ""]:
+            if len(fileTypes) > 0:
+                fileTypes = fileTypes + '|'
+            fileTypes = fileTypes + videoFileTypes
+        return '(-trailer[ _A-Za-z0-9.-]*.(' + fileTypes + ')$)'
+
     @staticmethod
     def getVideoThemeFileExtensions():
         fileTypes = []
@@ -580,6 +591,10 @@ class Settings():
         if index == 1:
             return True
         return False
+
+    @staticmethod
+    def useTrailers():
+        return ADDON.getSetting("useTrailers") == "true"
 
     @staticmethod
     def onlyPlaySingleTheme():

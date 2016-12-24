@@ -502,7 +502,9 @@ class ThemeFiles():
             themeFiles = themeFiles + self._getThemeFiles(nfoDir, True)
 
         del nfoRead
-        log("ThemeFiles: Searching %s for %s" % (directory, Settings.getThemeFileRegEx(directory, extensionOnly, self.audioOnly)), self.debug_logging_enabled)
+
+        themeRegex = Settings.getThemeFileRegEx(directory, extensionOnly, self.audioOnly)
+        log("ThemeFiles: Searching %s for %s" % (directory, themeRegex), self.debug_logging_enabled)
 
         # Make sure that the path does not point to a plugin, as we are checking the
         # file-system for themes, not plugins. This can be the case with Emby
@@ -513,12 +515,23 @@ class ThemeFiles():
             if dir_exists(directory):
                 dirs, files = list_dir(directory)
                 for aFile in files:
-                    m = re.search(Settings.getThemeFileRegEx(directory, extensionOnly, self.audioOnly), aFile, re.IGNORECASE)
+                    m = re.search(themeRegex, aFile, re.IGNORECASE)
                     if m:
                         path = os_path_join(directory, aFile)
                         log("ThemeFiles: Found match: %s" % path, self.debug_logging_enabled)
                         # Add the theme file to the list
                         themeFiles.append(path)
+                # Check to see if any themes were found, and if not see if we should try
+                # and use a trailer file instead
+                if (len(themeFiles) < 1) and (not self.audioOnly) and (not extensionOnly) and Settings.useTrailers():
+                    trailerRegEx = Settings.getTrailerFileRegEx()
+                    for aFile in files:
+                        m = re.search(trailerRegEx, aFile, re.IGNORECASE)
+                        if m:
+                            path = os_path_join(directory, aFile)
+                            log("ThemeFiles: Found trailer match: %s" % path, self.debug_logging_enabled)
+                            # Add the trailer file to the list
+                            themeFiles.append(path)
 
         return themeFiles
 
