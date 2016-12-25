@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import re
+import sys
 import time
 import traceback
 import xbmc
-import sys
 
 # Add JSON support for queries
 if sys.version_info < (2, 7):
@@ -360,7 +361,7 @@ class ThemePlayer(xbmc.Player):
             log("ThemePlayer: Failed to get track total time as not playing")
             self.trackEndTime = -1
 
-    # Check if tTvTunes is playing a video theme
+    # Check if TvTunes is playing a video theme
     def isPlayingTheme(self):
         # All audio is considered a theme
         if self.isPlayingAudio():
@@ -378,6 +379,26 @@ class ThemePlayer(xbmc.Player):
 
         if filePlaying in self.playListItems:
             return True
+        return False
+
+    # Check if TvTunes is playing a video trailer theme
+    def isPlayingTrailerTheme(self):
+        if not self.isPlayingVideo():
+            return False
+
+        filePlaying = ""
+        try:
+            # Get the currently playing file
+            filePlaying = self.getPlayingFile()
+        except:
+            log("ThemePlayer: Exception when checking if trailer theme is playing")
+
+        if filePlaying in self.playListItems:
+            # Check if it is a trailer theme
+            trailerRegEx = Settings.getTrailerFileRegEx()
+            m = re.search(trailerRegEx, filePlaying, re.IGNORECASE)
+            if m:
+                return True
         return False
 
     def updateVideoRefreshRate(self, themePlayList):
