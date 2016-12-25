@@ -164,7 +164,7 @@ class TunesBackend():
                     # Now that playing has started, update the current themes that are being used
                     self.oldThemeFiles = self.newThemeFiles
 
-            # Check the operations where wee are currently running and we need to stop
+            # Check the operations where we are currently running and we need to stop
             # playing the current theme
             if self.isAlive:
                 if self.themePlayer.isPlayingTheme():
@@ -199,6 +199,13 @@ class TunesBackend():
             # reset everything to highlight that nothing is playing
             if (not self.isPlayingZone()) and (not isForcedTvTunesContinue):
                 self.stop()
+            else:
+                # Check for the case where we are playing the trailer as a theme
+                # video, if so we want to stop the trailer playing when the video
+                # information screen is displayed. If we don't, when the trailer is
+                # started then TvTunes will automatically stop it
+                if Settings.useTrailers() and WindowShowing.isMovieInformation() and self.themePlayer.isPlayingTrailerTheme():
+                    self.stop()
 
             # Check to see if the setting to restrict the theme duration is enabled
             # and if it is we need to stop the current theme playing
