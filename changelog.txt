@@ -1,3 +1,6 @@
+v100.5.5 (2017-01-18)
+- Improve theme playing when TV Show listing is enabled
+
 v100.5.4 (2017-01-02)
 - Add support for webm video files
 - Add option to use trailers as theme videos
