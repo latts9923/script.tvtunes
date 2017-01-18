@@ -267,6 +267,8 @@ class WindowShowing():
             if 'special://profile/playlists/video/' in xbmc.getInfoLabel("container.folderpath"):
                 # Check if what is being showed is actually TV Shows
                 showingTvShowTitles = WindowShowing.isTvShows()
+            elif (xbmc.getInfoLabel("ListItem.dbtype") == 'tvshow'):
+                showingTvShowTitles = True
         return showingTvShowTitles
 
     @staticmethod
