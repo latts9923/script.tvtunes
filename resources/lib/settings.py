@@ -157,19 +157,19 @@ class WindowShowing():
 
     @staticmethod
     def isTvShows():
-        return xbmc.getCondVisibility("Container.Content(tvshows)") or WindowShowing.isTvTunesOverrideTvShows()
+        return xbmc.getCondVisibility("Container.Content(tvshows)") or (xbmc.getInfoLabel("ListItem.dbtype") == 'tvshow') or WindowShowing.isTvTunesOverrideTvShows()
 
     @staticmethod
     def isSeasons():
-        return xbmc.getCondVisibility("Container.Content(Seasons)") or WindowShowing.isTvTunesOverrideTvShows()
+        return xbmc.getCondVisibility("Container.Content(Seasons)") or (xbmc.getInfoLabel("ListItem.dbtype") == 'season') or WindowShowing.isTvTunesOverrideTvShows()
 
     @staticmethod
     def isEpisodes():
-        return xbmc.getCondVisibility("Container.Content(Episodes)") or WindowShowing.isTvTunesOverrideTvShows()
+        return xbmc.getCondVisibility("Container.Content(Episodes)") or (xbmc.getInfoLabel("ListItem.dbtype") == 'episode') or WindowShowing.isTvTunesOverrideTvShows()
 
     @staticmethod
     def isMovies():
-        return xbmc.getCondVisibility("Container.Content(movies)") or WindowShowing.isTvTunesOverrideMovie()
+        return xbmc.getCondVisibility("Container.Content(movies)") or (xbmc.getInfoLabel("ListItem.dbtype") == 'movie') or WindowShowing.isTvTunesOverrideMovie()
 
     @staticmethod
     def isScreensaver():
