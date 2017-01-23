@@ -430,7 +430,15 @@ msgctxt "#32143"
 msgid "Use Trailer Video If No Theme Available"
 msgstr ""
 
-#empty strings from id 32144 to 32200
+msgctxt "#32144"
+msgid "Use Local Theme Library"
+msgstr ""
+
+msgctxt "#32145"
+msgid "Local Theme Library Location"
+msgstr ""
+
+#empty strings from id 32146 to 32200
 
 msgctxt "#32201"
 msgid "Movies"

@@ -1,6 +1,6 @@
-v100.5.6
+v100.5.6 (2017-01-23)
 - Fix issue where a theme can restart if moving between series
-- TODO: Support local theme library
+- Support local theme library
 
 v100.5.5 (2017-01-22)
 - Improve theme playing when TV Show listing is enabled

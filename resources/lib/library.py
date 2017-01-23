@@ -6,8 +6,12 @@ import urllib2
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 
+from settings import Settings
 from settings import log
+from settings import os_path_split
+from settings import os_path_join
 from idLookup import IdLookup
 
 ADDON = xbmcaddon.Addon(id='script.tvtunes')
@@ -22,36 +26,45 @@ class ThemeLibrary():
         self.tvShowList = []
         self.movieList = []
 
-        # Read the registration file for the library details
-        try:
-            tvtunesRegStr = "PHR2dHVuZXNTdG9yZVJlZz4gICAgPGNvbmZpZz5odHRwOi8vc2l0ZXMuZ29vZ2xlLmNvbS9zaXRlL3JvYndlYnNldC90dnR1bmVzLXN0b3JlLWNvbmZpZy54bWw8L2NvbmZpZz48L3R2dHVuZXNTdG9yZVJlZz4="
+        # Check if a local theme library is being used
+        localThemeLibrary = Settings.getLocalThemeLibrary()
+        if localThemeLibrary not in [None, ""]:
+            self.libraryContentsFile = localThemeLibrary
+            # Set the base of the library to the directory the contents file is in
+            self.baseurl = os_path_split(localThemeLibrary)[0]
+            # Make sure the last character is a slash
+            self.baseurl = os_path_join(self.baseurl, "")
+        else:
+            # Read the registration file for the library details
+            try:
+                tvtunesRegStr = "PHR2dHVuZXNTdG9yZVJlZz4gICAgPGNvbmZpZz5odHRwOi8vc2l0ZXMuZ29vZ2xlLmNvbS9zaXRlL3JvYndlYnNldC90dnR1bmVzLXN0b3JlLWNvbmZpZy54bWw8L2NvbmZpZz48L3R2dHVuZXNTdG9yZVJlZz4="
 
-            # Get the library configuration from the registration file
-            tvtunesRegET = ET.ElementTree(ET.fromstring(base64.b64decode(tvtunesRegStr)))
+                # Get the library configuration from the registration file
+                tvtunesRegET = ET.ElementTree(ET.fromstring(base64.b64decode(tvtunesRegStr)))
 
-            configElem = tvtunesRegET.find('config')
-            if configElem is not None:
-                configLocation = configElem.text
-                if configLocation not in [None, ""]:
-                    # Read in all the configuration details
-                    tvtunesLibraryConfig = urllib2.urlopen(configLocation)
-                    tvtunesLibraryConfigStr = tvtunesLibraryConfig.read()
-                    # Closes the connection after we have read the configuration
-                    try:
-                        tvtunesLibraryConfig.close()
-                    except:
-                        log("ThemeLibrary: Failed to close connection for library config", xbmc.LOGERROR)
+                configElem = tvtunesRegET.find('config')
+                if configElem is not None:
+                    configLocation = configElem.text
+                    if configLocation not in [None, ""]:
+                        # Read in all the configuration details
+                        tvtunesLibraryConfig = urllib2.urlopen(configLocation)
+                        tvtunesLibraryConfigStr = tvtunesLibraryConfig.read()
+                        # Closes the connection after we have read the configuration
+                        try:
+                            tvtunesLibraryConfig.close()
+                        except:
+                            log("ThemeLibrary: Failed to close connection for library config", xbmc.LOGERROR)
 
-                    tvtunesLibraryET = ET.ElementTree(ET.fromstring(base64.b64decode(tvtunesLibraryConfigStr)))
+                        tvtunesLibraryET = ET.ElementTree(ET.fromstring(base64.b64decode(tvtunesLibraryConfigStr)))
 
-                    baseUrlElem = tvtunesLibraryET.find('baseurl')
-                    if baseUrlElem is not None:
-                        self.baseurl = baseUrlElem.text
-                    storeContentsElem = tvtunesLibraryET.find('storecontent')
-                    if storeContentsElem is not None:
-                        self.libraryContentsFile = storeContentsElem.text
-        except:
-            log("ThemeLibrary: %s" % traceback.format_exc(), xbmc.LOGERROR)
+                        baseUrlElem = tvtunesLibraryET.find('baseurl')
+                        if baseUrlElem is not None:
+                            self.baseurl = baseUrlElem.text
+                        storeContentsElem = tvtunesLibraryET.find('storecontent')
+                        if storeContentsElem is not None:
+                            self.libraryContentsFile = storeContentsElem.text
+            except:
+                log("ThemeLibrary: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
     # Get the items that are in the theme library
     def loadLibraryContents(self):
@@ -65,14 +78,23 @@ class ThemeLibrary():
 
         # Need to get the contents list
         try:
-            # Get the contents list from the library
-            remoteLibraryContents = urllib2.urlopen(self.libraryContentsFile)
-            libraryContentsDetails = remoteLibraryContents.read()
-            # Closes the connection after we have read the remote user list
-            try:
-                remoteLibraryContents.close()
-            except:
-                log("ThemeLibrary: Failed to close connection for remote library contents", xbmc.LOGERROR)
+            libraryContentsDetails = ""
+
+            # Check if the library contents file is local or remote
+            if self.libraryContentsFile.startswith("http"):
+                # Get the contents list from the library
+                remoteLibraryContents = urllib2.urlopen(self.libraryContentsFile)
+                libraryContentsDetails = remoteLibraryContents.read()
+                # Closes the connection after we have read the remote user list
+                try:
+                    remoteLibraryContents.close()
+                except:
+                    log("ThemeLibrary: Failed to close connection for remote library contents", xbmc.LOGERROR)
+            else:
+                # Read the contents of the file from disk
+                libContentsFile = xbmcvfs.File(self.libraryContentsFile, 'r')
+                libraryContentsDetails = libContentsFile.read()
+                libContentsFile.close()
 
             libraryContentsET = ET.ElementTree(ET.fromstring(libraryContentsDetails))
 
