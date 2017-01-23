@@ -177,8 +177,14 @@ class TvTunesFetcher():
                     xbmcvfs.mkdir(path)
                 except:
                     log("Download: problem with path: %s" % destination, True, xbmc.LOGERROR)
-            fp, h = urllib.urlretrieve(theme_url, tmpdestination, _report_hook)
-            log(h)
+
+            # Check if the file to download is on the local network or remote
+            if theme_url.startswith("http"):
+                fp, h = urllib.urlretrieve(theme_url, tmpdestination, _report_hook)
+                log(h)
+            else:
+                xbmcvfs.copy(theme_url, tmpdestination)
+
             # Apply authentication settings if they are not currently set
             if Settings.isSmbEnabled() and not ('@' in destination):
                 if destination.startswith("smb://"):
@@ -1326,9 +1332,11 @@ class SoundcloudListing(DefaultListing):
 #################################################
 class ThemeLibraryListing(DefaultListing):
     def themeSearch(self, name, alternativeTitle=None, isTvShow=None, year=None, imdb=None, showProgressDialog=True):
-        # The Theme Library is not available at the moment as there is no storage available
-        xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), "Unfortunately there is no longer any online storage available to host the Theme Library (Approx 80GB). If you have storage you are willing to make available please contact robwebset via http://github.com/robwebset")
-        return []
+        # Check if we are using a local theme library
+        if Settings.getLocalThemeLibrary() in [None, ""]:
+            # The Theme Library is not available at the moment as there is no storage available
+            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), "Unfortunately there is no longer any online storage available to host the Theme Library (Approx 80GB). If you have storage you are willing to make available please contact robwebset via http://github.com/robwebset")
+            return []
 
         progressDialog = DummyProgressDialog(name)
         if showProgressDialog:

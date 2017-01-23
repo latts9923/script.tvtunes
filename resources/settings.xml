@@ -34,6 +34,8 @@
 		<setting id="showVideoInfoButton" type="bool" label="32020" default="true"/>
 		<setting id="showOnContextMenu" type="bool" label="32096" default="true"/>
 		<setting id="enableUploads" type="bool" label="32097" default="true"/>
+		<setting id="useLocalThemeLibrary" type="bool" label="32144" default="false"/>
+		<setting id="localThemeLibrary" label="32145" subsetting="true" visible="eq(-1,true)" type="file" value=""/>
 		<setting label="32022" type="lsep"/>
 		<setting label="32023" type="action" option="close" action="RunScript($CWD/default.py)"/>
 		<setting label="32091" type="action" option="close" action="RunScript($CWD/advsettings.py)"/>

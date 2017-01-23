@@ -633,3 +633,9 @@ class Settings():
     @staticmethod
     def setTvTunesId():
         ADDON.setSetting("tvtunesId", Settings.getTvTunesId())
+
+    @staticmethod
+    def getLocalThemeLibrary():
+        if ADDON.getSetting("useLocalThemeLibrary") != "true":
+            return None
+        return ADDON.getSetting("localThemeLibrary")
