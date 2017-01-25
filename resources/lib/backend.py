@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
+import sys
+import traceback
 import xbmc
 import xbmcgui
-import sys
 
 # Add JSON support for queries
 if sys.version_info < (2, 7):
@@ -14,6 +15,7 @@ else:
 from settings import Settings
 from settings import log
 from settings import os_path_join
+from settings import os_path_split
 from settings import normalize_string
 from settings import WindowShowing
 
@@ -311,6 +313,33 @@ class TunesBackend():
                 themefile = MusicThemeFiles(debug_logging_enabled)
             else:
                 themefile = ThemeFiles(themePath, debug_logging_enabled=debug_logging_enabled)
+
+                # Check if no themes were found for this item, there is a case if it is a
+                # TV Show and it is nested Show-Name/Series-X/Episode-Directory/Episode.ext
+                # Then this will not pick up themes in the root of the TV Show directory
+                if (not themefile.hasThemes()) and (not Settings.isCustomPathEnabled()) and WindowShowing.isEpisodes():
+                    tvshowTitle = xbmc.getInfoLabel("ListItem.TVShowTitle")
+                    if tvshowTitle not in [None, ""]:
+                        try:
+                            # Make a call to the database to find out the root path of this TV Show
+                            filterStr = '{"operator": "is", "field": "title", "value": "%s"}' % tvshowTitle
+                            cmd = '{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["file"], "filter": %s},"id": 1 }' % filterStr
+                            json_query = xbmc.executeJSONRPC(cmd)
+                            json_query = simplejson.loads(json_query)
+                            if ("result" in json_query) and ('tvshows' in json_query['result']):
+                                # Get the path to the TV Show and compare it to where we were previously
+                                # looking
+                                tvshowList = json_query['result']['tvshows']
+                                if len(tvshowList) == 1:
+                                    tvshowPath = json_query['result']['tvshows'][0]['file']
+                                    # Make sure we have not already checked this path
+                                    # We will already have checked the parent path as well
+                                    if (tvshowPath != themePath) and (tvshowPath != os_path_split(themePath)[0]):
+                                        # So we know that we haven't checked the root of this TV Show yet
+                                        log("TunesBackend: Checking root TV Show Path = %s" % tvshowPath, debug_logging_enabled)
+                                        themefile = ThemeFiles(tvshowPath, debug_logging_enabled=debug_logging_enabled)
+                        except:
+                            log("TunesBackend: Failed to check root TV Show %s" % traceback.format_exc(), debug_logging_enabled)
 
         return themefile
 
