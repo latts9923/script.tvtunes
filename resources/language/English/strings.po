@@ -438,7 +438,27 @@ msgctxt "#32145"
 msgid "Local Theme Library Location"
 msgstr ""
 
-#empty strings from id 32146 to 32200
+msgctxt "#32146"
+msgid "Unable to update the Estuary skin"
+msgstr ""
+
+msgctxt "#32147"
+msgid "Estuary Skin Updated"
+msgstr ""
+
+msgctxt "#32148"
+msgid "This will update your Estuary Skin to include the TvTunes features. Continue?"
+msgstr ""
+
+msgctxt "#32149"
+msgid "Unable to update the Estuary skin"
+msgstr ""
+
+msgctxt "#32150"
+msgid "Update Estuary Skin"
+msgstr ""
+
+#empty strings from id 32151 to 32200
 
 msgctxt "#32201"
 msgid "Movies"

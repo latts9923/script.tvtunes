@@ -17,29 +17,29 @@ ADDON = xbmcaddon.Addon(id='script.tvtunes')
 # However they all end up re-ordering the attributes, so doing a diff
 # between changed files is very hard, so for this reason we do it
 # all manually without the aid of an XML parser
-class ConfUpdate():
+class EstuaryUpdate():
     def __init__(self):
-        # Find out where the confluence skin files are located
-        confAddon = xbmcaddon.Addon(id='skin.confluence')
-        self.confpath = xbmc.translatePath(confAddon.getAddonInfo('path'))
-        self.confpath = os_path_join(self.confpath, '720p')
-        log("Confluence Location: %s" % self.confpath)
+        # Find out where the Estuary skin files are located
+        estuaryAddon = xbmcaddon.Addon(id='skin.estuary')
+        self.estuarypath = xbmc.translatePath(estuaryAddon.getAddonInfo('path'))
+        self.estuarypath = os_path_join(self.estuarypath, 'xml')
+        log("Estuary Location: %s" % self.estuarypath)
         # Create the timestamp centrally, as we want all files changed for a single
         # run to have the same backup timestamp so it can be easily undone if the
         # user wishes to switch it back
         self.bak_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         self.errorToLog = False
 
-    # Method to update all of the required Confluence files
+    # Method to update all of the required Estuary files
     def updateSkin(self):
         # Update the files one at a time
         self._updateDialogVideoInfo()
 
         # Now either print the complete message or the "check log" message
         if self.errorToLog:
-            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32137), ADDON.getLocalizedString(32135))
+            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32137), ADDON.getLocalizedString(32146))
         else:
-            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32138), ADDON.getLocalizedString(32139))
+            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32147), ADDON.getLocalizedString(32139))
 
     # Save the new contents, taking a backup of the old file
     def _saveNewFile(self, dialogXml, dialogXmlStr):
@@ -59,8 +59,8 @@ class ConfUpdate():
     # Makes all the required changes to DialogVideoInfo.xml
     def _updateDialogVideoInfo(self):
         # Get the location of the information dialog XML file
-        dialogXml = os_path_join(self.confpath, 'DialogVideoInfo.xml')
-        log("DialogVideoInfo: Confluence dialog XML file: %s" % dialogXml)
+        dialogXml = os_path_join(self.estuarypath, 'DialogVideoInfo.xml')
+        log("DialogVideoInfo: Estuary dialog XML file: %s" % dialogXml)
 
         # Make sure the file exists (It should always exist)
         if not xbmcvfs.exists(dialogXml):
@@ -82,7 +82,7 @@ class ConfUpdate():
             return
 
         # Now we need to add the button after the Final button
-        previousButton = '<label>13511</label>'
+        previousButton = '<param name="label" value="$LOCALIZE[13511]" />'
 
         if previousButton not in dialogXmlStr:
             # The file has had a standard component deleted, so quit
@@ -92,21 +92,22 @@ class ConfUpdate():
 
         # Check to make sure we use a unique ID value for the button
         idOK = False
-        idval = 100
+        idval = 201
         while not idOK:
-            idStr = "id=\"%d\"" % idval
+            idStr = '<param name="id" value="%d"' % idval
             if idStr not in dialogXmlStr:
                 idOK = True
             else:
                 idval = idval + 1
 
         # Now add the Video Extras button after the Final one
-        DIALOG_VIDEO_INFO_BUTTON = '''\n\t\t\t\t\t</control>\n\t\t\t\t\t<control type="button" id="%d">
-\t\t\t\t\t\t<description>TvTunes</description>
-\t\t\t\t\t\t<include>ButtonInfoDialogsCommonValues</include>
-\t\t\t\t\t\t<label>$ADDON[script.tvtunes 32105]</label>
-\t\t\t\t\t\t<onclick>RunScript(script.tvtunes,mode=solo)</onclick>
-\t\t\t\t\t\t<visible>System.HasAddon(script.tvtunes) + [Container.Content(TVShows) | Container.Content(movies) | Container.Content(musicvideos)] + IsEmpty(Window(movieinformation).Property("TvTunes_HideVideoInfoButton"))</visible>'''
+        DIALOG_VIDEO_INFO_BUTTON = '''\n\t\t\t\t\t</include>\n\t\t\t\t\t<include content="InfoDialogButton">
+\t\t\t\t\t\t<param name="id" value="%d" />
+\t\t\t\t\t\t<param name="icon" value="icons/sidemenu/musicvideos.png" />
+\t\t\t\t\t\t<param name="label" value="$ADDON[script.tvtunes 32105]" />
+\t\t\t\t\t\t<param name="onclick_1" value="Action(close)" />
+\t\t\t\t\t\t<param name="onclick_2" value="RunScript(script.tvtunes,mode=solo)" />
+\t\t\t\t\t\t<param name="visible" value="System.HasAddon(script.tvtunes) + [String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode) | String.IsEqual(ListItem.DBType,musicvideo)] + IsEmpty(Window(movieinformation).Property(TvTunes_HideVideoInfoButton))" />'''
 
         insertTxt = previousButton + (DIALOG_VIDEO_INFO_BUTTON % idval)
         dialogXmlStr = dialogXmlStr.replace(previousButton, insertTxt)
@@ -118,15 +119,15 @@ class ConfUpdate():
 # Main
 #########################
 if __name__ == '__main__':
-    log("TvTunes: Updating Confluence Skin (version %s)" % ADDON.getAddonInfo('version'))
+    log("TvTunes: Updating Estuary Skin (version %s)" % ADDON.getAddonInfo('version'))
 
-    doUpdate = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32134))
+    doUpdate = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32148))
 
     if doUpdate:
         try:
-            confUp = ConfUpdate()
-            confUp.updateSkin()
-            del confUp
+            estuaryUp = EstuaryUpdate()
+            estuaryUp.updateSkin()
+            del estuaryUp
         except:
             log("VideoExtras: %s" % traceback.format_exc(), xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32135), ADDON.getLocalizedString(32136))
+            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32149), ADDON.getLocalizedString(32136))
