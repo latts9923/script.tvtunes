@@ -23,7 +23,6 @@ from resources.lib.settings import os_path_split
 from resources.lib.settings import list_dir
 from resources.lib.settings import normalize_string
 from resources.lib.settings import dir_exists
-from resources.lib.themeFetcher import TvTunesFetcher
 from resources.lib.themeFinder import ThemeFiles
 
 ADDON = xbmcaddon.Addon(id='script.tvtunes')
@@ -91,24 +90,6 @@ class MenuNavigator():
         li.setInfo('video', {'PlayCount': self.missingThemesOnly})
         li.addContextMenuItems([], replaceItems=True)
         xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
-
-        # Action: Retrieve missing themes
-        url = self._build_url({'mode': 'action', 'actiontype': 'RetrieveMissingAudioThemes'})
-        filterTitle = "  %s" % ADDON.getLocalizedString(32205)
-        li = xbmcgui.ListItem(filterTitle, iconImage=ICON)
-        li.setProperty("Fanart_Image", FANART)
-        li.addContextMenuItems([], replaceItems=True)
-        xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
-
-        # Action: Retrieve missing themes
-        # Add the moment only the Theme Library supports videos
-        if Settings.getSearchEngine() in [Settings.ALL_ENGINES, Settings.THEMELIBRARY]:
-            url = self._build_url({'mode': 'action', 'actiontype': 'RetrieveMissingVideoThemes'})
-            filterTitle = "  %s" % ADDON.getLocalizedString(32209)
-            li = xbmcgui.ListItem(filterTitle, iconImage=ICON)
-            li.setProperty("Fanart_Image", FANART)
-            li.addContextMenuItems([], replaceItems=True)
-            xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
 
         xbmcplugin.endOfDirectory(self.addon_handle)
 
@@ -273,22 +254,6 @@ class MenuNavigator():
                 xbmc.executebuiltin("Container.Refresh")
                 return
 
-        if originaltitle is not None:
-            originaltitle = normalize_string(originaltitle)
-
-        # Perform the fetch
-        videoList = []
-        normtitle = normalize_string(title)
-        videoItem = {'title': normtitle, 'path': path, 'originalTitle': originaltitle, 'isTvShow': isTvShow, 'year': year, 'imdb': imdb}
-        videoList.append(videoItem)
-        TvTunesFetcher(videoList)
-
-        # Stop playing any theme that started
-        self._stopPlayingTheme()
-
-        # Now reload the screen to reflect the change
-        xbmc.executebuiltin("Container.Refresh")
-
     def _startPlayingExistingTheme(self, path):
         log("startPlayingExistingTheme: Playing existing theme for %s" % path)
         # Search for the themes
@@ -308,77 +273,6 @@ class MenuNavigator():
             xbmc.Player().stop()
         while xbmc.Player().isPlayingAudio():
             xbmc.sleep(5)
-
-    # Does a search for all the missing themes
-    def fetchMissingThemes(self, incAudioThemes=True, incVideoThemes=False):
-        # Prompt the user to see if they want all the themes or just some
-        # of them
-        displayList = []
-        displayList.append(ADDON.getLocalizedString(32210))
-        displayList.append(ADDON.getLocalizedString(32211))
-        displayList.append(ADDON.getLocalizedString(32212))
-        displayList.append(ADDON.getLocalizedString(32213))
-
-        # Show the list to the user
-        select = xbmcgui.Dialog().select(ADDON.getLocalizedString(32105), displayList)
-        if select < 0:
-            log("fetchMissingThemes: Cancelled by user")
-            return
-
-        # It could take a little while to get the videos so show the busy dialog
-        xbmc.executebuiltin("ActivateWindow(busydialog)")
-
-        tvShows = []
-        if (select == 0) or (select == 1):
-            log("fetchMissingThemes: Checking TV Shows")
-            tvShows = self.getVideos('GetTVShows', MenuNavigator.TVSHOWS)
-        movies = []
-        if (select == 0) or (select == 2):
-            log("fetchMissingThemes: Checking Movies")
-            movies = self.getVideos('GetMovies', MenuNavigator.MOVIES)
-        music = []
-        if (select == 0) or (select == 3):
-            log("fetchMissingThemes: Checking Music Videos")
-            music = self.getVideos('GetMusicVideos', MenuNavigator.MUSICVIDEOS)
-
-        videoList = []
-
-        moveExistingThemes = None
-
-        for videoItem in (tvShows + movies + music):
-            # Get the path where the theme should be stored
-            path = self.getPathForVideoItem(videoItem)
-            # Skip items that already have themes
-            if self._doesThemeExist(path, False, incAudioThemes, incVideoThemes):
-                continue
-
-            if Settings.isThemeDirEnabled() and self._doesThemeExist(path, True, incAudioThemes, incVideoThemes):
-                if moveExistingThemes is None:
-                    xbmc.executebuiltin("Dialog.Close(busydialog)")
-                    # Prompt user if we should move themes in the parent
-                    # directory into the theme directory
-                    moveExistingThemes = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32105), ADDON.getLocalizedString(32206), ADDON.getLocalizedString(32207))
-                    xbmc.executebuiltin("ActivateWindow(busydialog)")
-
-                # Check if we need to move a theme file
-                if moveExistingThemes:
-                    log("fetchAllMissingThemes: Moving theme for %s" % videoItem['title'])
-                    self._moveToThemeFolder(path)
-                continue
-
-            normtitle = normalize_string(videoItem['title']).encode("utf-8")
-            normOriginalTitle = None
-            if videoItem['originaltitle'] is not None:
-                normOriginalTitle = normalize_string(videoItem['originaltitle']).encode("utf-8")
-
-            videoItem = {'title': normtitle, 'path': path.encode("utf-8"), 'originalTitle': normOriginalTitle, 'isTvShow': videoItem['isTvShow'], 'year': videoItem['year'], 'imdb': videoItem['imdb']}
-            videoList.append(videoItem)
-
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
-
-        if len(videoList) > 0:
-            fetcher = TvTunesFetcher(videoList, incAudioThemes, incVideoThemes)
-            del fetcher
 
     # Moves a theme that is not in a theme folder to a theme folder
     def _moveToThemeFolder(self, directory):
@@ -506,21 +400,3 @@ if __name__ == '__main__':
 
         # Now reload the screen to reflect the change
         xbmc.executebuiltin("Container.Refresh")
-
-    elif mode[0] == 'action':
-        log("TvTunesPlugin: Mode is ACTION")
-
-        incAudio = False
-        incVideo = False
-
-        actionType = args.get('actiontype', None)
-        if actionType is not None:
-            if actionType[0] in ['RetrieveMissingAudioThemes']:
-                incAudio = True
-            if actionType[0] in ['RetrieveMissingVideoThemes']:
-                incVideo = True
-
-        # Only one action at the moment
-        menuNav = MenuNavigator(base_url, addon_handle)
-        menuNav.fetchMissingThemes(incAudio, incVideo)
-        del menuNav

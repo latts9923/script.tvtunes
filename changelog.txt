@@ -1,3 +1,6 @@
+v100.6.0 (2018-06-01)
+- Final Update
+
 v100.5.8 (2017-02-03)
 - Add support to add button to Estuary Video Info Dialog
 
