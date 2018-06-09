@@ -12,7 +12,6 @@ else:
 # Import the common settings
 from resources.lib.settings import log
 from resources.lib.settings import Settings
-from resources.lib.settings import WindowShowing
 from resources.lib.backend import TunesBackend
 
 ADDON = xbmcaddon.Addon(id='script.tvtunes')

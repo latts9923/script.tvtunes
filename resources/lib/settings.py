@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unicodedata
-import uuid
 import xbmc
 import xbmcaddon
 import xbmcvfs
