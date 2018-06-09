@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="32105">
-		<setting id="tvtunesId" visible="false" option="hidden" enable="false" type="text" label="32098 " default="" />
 		<setting id="enableThemePlaying" type="bool" label="32084" default="true"/>
 		<setting id="movielist" type="bool" label="32016" default="false"/>
 		<setting id="tvlist" type="bool" label="32017" default="false"/>

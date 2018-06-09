@@ -292,47 +292,16 @@ class WindowShowing():
         folderPathId = "videodb://movies/sets/"
         return xbmc.getCondVisibility("!IsEmpty(ListItem.DBID) + SubString(ListItem.Path," + folderPathId + ",left)")
 
-    @staticmethod
-    def updateHideVideoInfoButton():
-        if Settings.hideVideoInfoButton():
-            xbmcgui.Window(12003).setProperty("TvTunes_HideVideoInfoButton", "true")
-        else:
-            xbmcgui.Window(12003).clearProperty("TvTunes_HideVideoInfoButton")
-
-    @staticmethod
-    def updateShowOnContextMenu():
-        if Settings.showOnContextMenu():
-            xbmcgui.Window(10000).setProperty("TvTunes_ShowContextMenu", "true")
-        else:
-            xbmcgui.Window(10000).clearProperty("TvTunes_ShowContextMenu")
-
 
 ##############################
 # Stores Various Settings
 ##############################
 class Settings():
-    ALL_ENGINES = 'All'
-    TELEVISION_TUNES = 'televisiontunes.com'
-    SOUNDCLOUD = 'soundcloud.com'
-    GOEAR = 'goear.com'
-    THEMELIBRARY = 'themelibrary'
-    PLEXLIBRARY = 'plexlibrary'
-    PROMPT_ENGINE = 'Prompt User'
-
-    # Settings for Automatically Downloading
-    AUTO_DOWNLOAD_SINGLE_ITEM = 1
-    AUTO_DOWNLOAD_PRIORITY_1 = 2
-    AUTO_DOWNLOAD_PRIORITY_1_OR_2 = 2
-
     @staticmethod
     def reloadSettings():
         # Force the reload of the settings to pick up any new values
         global ADDON
         ADDON = xbmcaddon.Addon(id='script.tvtunes')
-        # The user may have change the display settings to show or hide the info button
-        # so make sure we update it
-        WindowShowing.updateHideVideoInfoButton()
-        WindowShowing.updateShowOnContextMenu()
 
     # Checks if the given file is names as a video file
     @staticmethod
@@ -540,40 +509,6 @@ class Settings():
         return ADDON.getSetting("subDirName")
 
     @staticmethod
-    def getAutoDownloadSetting():
-        return int(ADDON.getSetting("auto_download"))
-
-    @staticmethod
-    def isAutoDownloadPromptUser():
-        # If no auto select is set, then always prompt the user
-        if Settings.getAutoDownloadSetting() == 0:
-            return True
-        return ADDON.getSetting("auto_prompt_user_if_required") == 'true'
-
-    @staticmethod
-    def isMultiThemesSupported():
-        return ADDON.getSetting("multiThemeDownload") == 'true'
-
-    @staticmethod
-    def getSearchEngine():
-        index = int(ADDON.getSetting("searchSource"))
-        if index == 0:
-            return Settings.ALL_ENGINES
-        elif index == 1:
-            return Settings.TELEVISION_TUNES
-        elif index == 2:
-            return Settings.SOUNDCLOUD
-        elif index == 3:
-            return Settings.GOEAR
-        elif index == 4:
-            return Settings.THEMELIBRARY
-        elif index == 5:
-            return Settings.PLEXLIBRARY
-
-        # Default is to prompt the user
-        return Settings.PROMPT_ENGINE
-
-    @staticmethod
     def getStartupVolume():
         # Check to see if the volume needs to be changed when the system starts
         if ADDON.getSetting("resetVolumeOnStartup") == 'true':
@@ -616,26 +551,3 @@ class Settings():
     @staticmethod
     def blockRefreshRateChange():
         return ADDON.getSetting("blockChangeInRefreshRate") == "true"
-
-    @staticmethod
-    def isUploadEnabled():
-        return ADDON.getSetting("enableUploads") == "true"
-
-    @staticmethod
-    def getUploadSettings():
-        return 'aHR0cHM6Ly9zaXRlcy5nb29nbGUuY29tL3NpdGUvcm9id2Vic2V0L3R2dHVuZXMtdXBsb2FkLWNvbmZpZy54bWw='
-
-    @staticmethod
-    def getTvTunesId():
-        # The ID that will be used to identify this installation
-        return str(uuid.getnode())
-
-    @staticmethod
-    def setTvTunesId():
-        ADDON.setSetting("tvtunesId", Settings.getTvTunesId())
-
-    @staticmethod
-    def getLocalThemeLibrary():
-        if ADDON.getSetting("useLocalThemeLibrary") != "true":
-            return None
-        return ADDON.getSetting("localThemeLibrary")

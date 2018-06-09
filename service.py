@@ -33,9 +33,6 @@ class TvTunesMonitor(xbmc.Monitor):
 if __name__ == '__main__':
     log("Starting TvTunes Service %s" % ADDON.getAddonInfo('version'))
 
-    # Make sure we have recorded this machines Id
-    Settings.setTvTunesId()
-
     # Check if the settings mean we want to reset the volume on startup
     startupVol = Settings.getStartupVolume()
 
@@ -45,21 +42,9 @@ if __name__ == '__main__':
         log("TvTunesService: Setting volume to %s" % startupVol)
         xbmc.executebuiltin('SetVolume(%d)' % startupVol, True)
 
-    # Check if the video info button should be hidden, we do this here as this will be
-    # called when the system is loaded, it can then be read by the skin
-    # when it comes to draw the button
-    WindowShowing.updateHideVideoInfoButton()
-    WindowShowing.updateShowOnContextMenu()
-
     # Make sure the user wants to play themes
     if Settings.isThemePlayingEnabled():
         log("TvTunesService: Theme playing enabled")
-
-        # if Settings.isUploadEnabled():
-        #    log("TvTunesService: Launching uploader")
-        #    xbmc.executebuiltin('RunScript(%s)' % os.path.join(LIB_DIR, "upload.py"), False)
-        # else:
-        #    log("TvTunesService: Uploader not enabled")
 
         displayNotice = True
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddonDetails", "params": { "addonid": "repository.urepo", "properties": ["enabled", "broken", "name", "author"]  }, "id": 1}')
