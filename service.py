@@ -45,28 +45,16 @@ if __name__ == '__main__':
     if Settings.isThemePlayingEnabled():
         log("TvTunesService: Theme playing enabled")
 
-        displayNotice = True
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddonDetails", "params": { "addonid": "repository.urepo", "properties": ["enabled", "broken", "name", "author"]  }, "id": 1}')
-        json_response = json.loads(json_query)
+        # Create a monitor so we can reload the settings if they change
+        systemMonitor = TvTunesMonitor()
 
-        if ("result" in json_response) and ('addon' in json_response['result']):
-            addonItem = json_response['result']['addon']
-            if (addonItem['enabled'] is True) and (addonItem['broken'] is False) and (addonItem['type'] == 'xbmc.addon.repository') and (addonItem['addonid'] == 'repository.urepo'):
-                displayNotice = False
+        # Start looping to perform the TvTune theme operations
+        main = TunesBackend()
 
-                # Create a monitor so we can reload the settings if they change
-                systemMonitor = TvTunesMonitor()
+        # Start the themes running
+        main.runAsAService()
 
-                # Start looping to perform the TvTune theme operations
-                main = TunesBackend()
-
-                # Start the themes running
-                main.runAsAService()
-
-                del main
-                del systemMonitor
-
-        if displayNotice:
-            xbmc.executebuiltin('Notification("URepo Repository Required","www.urepo.org",10000,%s)' % ADDON.getAddonInfo('icon'))
+        del main
+        del systemMonitor
     else:
         log("TvTunesService: Theme playing disabled")

@@ -1,8 +1,6 @@
 [[https://github.com/robwebset/script.tvtunes/raw/master/icon.png]]
 
 == Introduction ==
-You can install this addon from: [https://www.urepo.org URepo Repository]
-<br />
 == Downloading Themes ==
 You can use TvTunes to download themes for you using one of the following methods:
 * Using the TvTunes Context Menu when on a given TV Show or Movie
